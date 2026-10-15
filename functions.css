@@ -1,24 +1,17 @@
+/* --- СТРАНИЦА ФУНКЦИЙ --- */
 .functions-content {
     display: flex;
     flex-direction: column;
     align-items: center;
     padding: 20px;
-    min-height: calc(100vh - 60px);
+    padding-bottom: 90px; /* Отступ снизу, чтобы контент не заезжал на фиксированную кнопку */
+    min-height: auto; /* Убрали фиксированную высоту */
     position: relative;
     z-index: 10;
     color: var(--color-white);
     width: 100%;
+    background: transparent;
 }
-
-.back-link {
-    font-family: var(--font-backup);
-    font-size: 0.9rem;
-    color: #888;
-    cursor: pointer;
-    margin-bottom: 20px;
-    transition: color 0.2s;
-}
-.back-link:hover { color: var(--color-white); }
 
 .page-title h1 {
     font-family: var(--font-primary);
@@ -60,7 +53,7 @@
 
 .module-btn {
     display: flex;
-    align-items: flex-start; /* Выравниваем по верхнему краю текста */
+    align-items: flex-start;
     width: 100%;
     padding: 18px;
     background: transparent;
@@ -96,3 +89,164 @@
 .btn-text { display: flex; flex-direction: column; gap: 4px; }
 .btn-title { font-family: var(--font-backup); font-size: 1rem; font-weight: 500; }
 .btn-desc { font-family: var(--font-backup); font-size: 0.8rem; color: #aaa; line-height: 1.3; }
+
+/* --- ФИКСИРОВАННАЯ КНОПКА НА ГЛАВНУЮ --- */
+.fixed-home-btn {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 20;
+    
+    font-family: var(--font-backup);
+    font-size: 0.95rem;
+    color: var(--color-white);
+    background: rgba(15, 15, 15, 0.8);
+    backdrop-filter: blur(10px);
+    border: 1px solid #444;
+    border-radius: 30px;
+    padding: 12px 25px;
+    cursor: pointer;
+    text-decoration: none;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+    transition: background 0.2s, transform 0.2s;
+}
+
+.fixed-home-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateX(-50%) translateY(-3px);
+}
+
+.fixed-home-btn::before {
+    content: '←';
+    margin-right: 8px;
+}
+
+/* --- СТИЛИ МОДАЛОК (остаются без изменений) --- */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(5px);
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+}
+.modal-window {
+    background: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 12px;
+    padding: 25px;
+    width: 90%;
+    max-width: 400px;
+    position: relative;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+.lock-icon {
+    width: 24px;
+    height: 24px;
+    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%23fff" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>') no-repeat center;
+    background-size: contain;
+}
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: #888;
+    cursor: pointer;
+    line-height: 1;
+}
+.pricing-option {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    border: 1px solid #333;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: border-color 0.2s, background-color 0.2s;
+}
+.pricing-option:hover { border-color: #555; }
+.pricing-option.selected { border-color: #3a86ff; background: rgba(58, 134, 255, 0.1); }
+.pricing-info h4 { margin: 0 0 5px 0; font-size: 1.1rem; }
+.pricing-info p { margin: 0; color: #aaa; font-size: 0.85rem; }
+.pricing-badge { background: #ff6b6b; color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; }
+.pricing-price { font-size: 1.2rem; font-weight: bold; color: #4CAF50; }
+
+.payment-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #333;
+}
+.payment-method-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.payment-method-title {
+    font-family: var(--font-primary);
+    font-size: 1.1rem;
+    margin-bottom: 20px;
+    color: var(--color-white);
+}
+.payment-method-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 100%;
+}
+.btn-back-from-payment-method {
+    margin-top: 20px;
+    font-family: var(--font-backup);
+    font-size: 0.9rem;
+    color: #888;
+    background: transparent;
+    border: 1px solid #333;
+    padding: 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+.btn-back-from-payment-method:hover { background: #222; }
+
+.payment-card {
+    text-align: center;
+}
+.warning-note {
+    color: #ff6b6b;
+    font-weight: bold;
+    margin-top: 15px;
+}
+#notification-bar {
+    position: fixed;
+    top: 70px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(220, 0, 0, 0.9);
+    color: white;
+    padding: 15px 20px;
+    border-radius: 8px;
+    z-index: 500;
+    font-size: 0.9rem;
+    text-align: center;
+    max-width: 90%;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+}
+#notification-bar a { color: #3a86ff; text-decoration: underline; }
