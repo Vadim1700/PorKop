@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Анимированный звездный фон (Версия 2.0)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #e0e0e0;
+            overflow: hidden;
+        }
+
+        body {
+            background: 
+                radial-gradient(ellipse at top, #0b0d26 0%, transparent 70%),
+                radial-gradient(ellipse at bottom, #1a002e 0%, #000000 100%);
+            position: relative;
+        }
+
+        /* Контейнер для всех звезд, чтобы управлять ими через JS */
+        .starfield {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        /* Базовый класс звезды */
+        .star {
+            position: absolute;
+            background-color: #ffffff;
+            border-radius: 50%;
+            pointer-events: none;
+            box-shadow: 0 0 3px 1px rgba(255, 255, 255, 0.8);
+            animation-name: twinkle, drift-star;
+            animation-iteration-count: infinite;
+            animation-timing-function: linear, ease-in-out;
+        }
+
+        /* Анимация мерцания с рандомной задержкой и скоростью */
+        @keyframes twinkle {
+            0%, 100% { opacity: 0; transform: scale(0.5); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+
+        /* Плавное смещение каждой звезды в случайном направлении */
+        @keyframes drift-star {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(var(--dx), var(--dy)) scale(var(--end-scale)); }
+        }
+
+        /* Слой далеких звезд (создаем через JS для плотности) */
+        .layer-far .star {
+            box-shadow: 0 0 1px 0px rgba(255, 255, 255, 0.5);
+        }
+
+        /* Слой близких звезд — ярче и с легким свечением */
+        .layer-near .star {
+            box-shadow: 0 0 4px 2px rgba(255, 255, 255, 0.9);
+        }
+
+        /* Стили для контента */
+        .content {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            padding: 40px 20px;
+            text-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            text-shadow: 0 0 25px rgba(255, 255, 255, 0.5);
+        }
+
+        p {
+            font-size: 1.3rem;
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.7;
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <div class="starfield" id="layerFar"></div>
+    <div class="starfield" id="layerNear"></div>
+
+    <div class="content">
+    </div>
+
+    <script>
+        // Настройки
+        const config = {
+            farStars: 200,  // Количество далеких звезд (больше для плотности)
+            nearStars: 60,  // Количество близких (крупных) звезд
+            minSize: 0.5,   // Минимальный размер в пикселях
+            maxSize: 2.5,   // Максимальный размер
+            driftDistance: 50 // На сколько пикселей звезда может уплыть
+        };
+
+        function createStars(count, containerClass, isNear) {
+            const container = document.getElementById(containerClass);
+            
+            for (let i = 0; i < count; i++) {
+                const star = document.createElement('div');
+                star.classList.add('star');
+
+                // Случайный размер
+                const size = (Math.random() * (config.maxSize - config.minSize) + config.minSize).toFixed(2);
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+
+                // Случайная позиция
+                const x = Math.random() * 100; // vw
+                const y = Math.random() * 100; // vh
+                star.style.left = `${x}vw`;
+                star.style.top = `${y}vh`;
+
+                // Для анимации дрейфа задаем случайные CSS-переменные
+                const dx = (Math.random() * config.driftDistance * 2 - config.driftDistance).toFixed(2);
+                const dy = (Math.random() * config.driftDistance * 2 - config.driftDistance).toFixed(2);
+                
+                // Близкие звезды в конце пути должны немного увеличиваться (эффект приближения)
+                const endScale = isNear ? (1 + Math.random() * 0.5).toFixed(2) : 1;
+
+                star.style.setProperty('--dx', `${dx}px`);
+                star.style.setProperty('--dy', `${dy}px`);
+                star.style.setProperty('--end-scale', endScale);
+
+                // Случайная задержка и длительность для рассинхрона
+                star.style.animationDelay = `${Math.random() * 10}s`;
+                star.style.animationDuration = `${(Math.random() * 40 + 20).toFixed(1)}s`; // от 20 до 60 секунд
+
+                container.appendChild(star);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            createStars(config.farStars, 'layerFar', false);
+            createStars(config.nearStars, 'layerNear', true);
+        });
+    </script>
+</body>
+</html>

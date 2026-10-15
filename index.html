@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maestro</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<!-- СЛОИ ЗВЕЗДНОГО НЕБА (вместо фонового видео) -->
+<div class="starfield" id="layerFar"></div>
+<div class="starfield" id="layerNear"></div>
+
+    <header class="header">
+        <div class="logo">
+            <div class="logo-square"></div>
+            <span>Maestro</span>
+        </div>
+        <div class="online-status">
+            <span id="current-time">--:--:--</span>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="hero-title">
+            <h1>Maestro</h1>
+            <p>Что-то большее, чем просто Telegram бот.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="card-corner top-left"></div>
+            <div class="card-corner bottom-right"></div>
+            <div class="card-header">01 / 12</div>
+            <div class="card-body">
+                <p>Цифровая тень есть у каждого — мы умеем читать её без остатка.</p>
+                <div class="card-divider"></div>
+            </div>
+        </div>
+
+        <div class="buttons-container">
+            <button class="nav-btn" onclick="window.location.href='functions.html'">
+                <span>ФУНКЦИИ</span>
+                <span class="arrow">→</span>
+            </button>
+            <button class="nav-btn" onclick="window.location.href='reviews.html'">
+                <span>ОТЗЫВЫ</span>
+                <span class="arrow">→</span>
+            </button>
+        </div>
+
+        <div class="footer-text">
+            <a href="privacy.html" class="privacy-link">политика конфиденциальности</a>
+        </div>
+    </main>
+
+    <!-- КРАСНАЯ ПЛАШКА -->
+    <div id="notification-bar" style="display: none;">
+        🎩 Увы, вы не отправили сумму в течение 5 минут. Попробуйте заново, создав новую заявку на пополнение.
+        <br>Если у вас проблемы с платежом, напишите в техническую поддержку <a href="https://t.me/Technical_helpers" target="_blank">@Technical_helpers</a> ⛑️
+    </div>
+
+    <!-- МОДАЛЬНЫЕ ОКНА (остаются как в прошлом ответе) -->
+    <div class="modal-overlay" id="accessModal" style="display: none;"> ... </div>
+    <div class="modal-overlay" id="tariffModal" style="display: none;"> ... </div>
+    <div class="modal-overlay" id="paymentMethodModal" style="display: none;"> ... </div>
+    <div class="modal-overlay" id="paymentCardModal" style="display: none;"> ... </div>
+
+    <script src="script.js"></script>
+    <script>
+        /* --- ИНИЦИАЛИЗАЦИЯ ЗВЕЗДНОГО НЕБА (Версия 2.0) --- */
+        const config = {
+            farStars: 200,  // Количество далеких звезд (больше для плотности)
+            nearStars: 60,  // Количество близких (крупных) звезд
+            minSize: 0.5,   // Минимальный размер в пикселях
+            maxSize: 2.5,   // Максимальный размер
+            driftDistance: 50 // На сколько пикселей звезда может уплыть
+        };
+
+        function createStars(count, containerClass, isNear) {
+            const container = document.getElementById(containerClass);
+            
+            for (let i = 0; i < count; i++) {
+                const star = document.createElement('div');
+                star.classList.add('star');
+
+                // Случайный размер
+                const size = (Math.random() * (config.maxSize - config.minSize) + config.minSize).toFixed(2);
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+
+                // Случайная позиция
+                const x = Math.random() * 100; // vw
+                const y = Math.random() * 100; // vh
+                star.style.left = `${x}vw`;
+                star.style.top = `${y}vh`;
+
+                // Для анимации дрейфа задаем случайные CSS-переменные
+                const dx = (Math.random() * config.driftDistance * 2 - config.driftDistance).toFixed(2);
+                const dy = (Math.random() * config.driftDistance * 2 - config.driftDistance).toFixed(2);
+                
+                // Близкие звезды в конце пути должны немного увеличиваться (эффект приближения)
+                const endScale = isNear ? (1 + Math.random() * 0.5).toFixed(2) : 1;
+
+                star.style.setProperty('--dx', `${dx}px`);
+                star.style.setProperty('--dy', `${dy}px`);
+                star.style.setProperty('--end-scale', endScale);
+
+                // Случайная задержка и длительность для рассинхрона
+                star.style.animationDelay = `${Math.random() * 10}s`;
+                star.style.animationDuration = `${(Math.random() * 40 + 20).toFixed(1)}s`; // от 20 до 60 секунд
+
+                container.appendChild(star);
+            }
+        }
+
+        /* --- ГЕНЕРАЦИЯ ID --- */
+        function generateUserID() {
+            let currentUserID = localStorage.getItem('maestroUserID');
+            if (!currentUserID) {
+                currentUserID = Math.floor(Date.now() / 1000).toString(36) + Math.random().toString(36).substr(2, 5).toUpperCase();
+                localStorage.setItem('maestroUserID', currentUserID);
+            }
+            return currentUserID;
+        }
+
+        /* --- ФУНКЦИИ УПРАВЛЕНИЯ МОДАЛЬНЫМИ ОКНАМИ --- */
+        function openModal(modalId) { 
+            document.getElementById(modalId).style.display = 'flex'; 
+        }
+        function closeModal(modalId) { 
+            document.getElementById(modalId).style.display = 'none'; 
+        }
+
+        /* --- УВЕДОМЛЕНИЕ (Красная плашка) --- */
+        function showNotification() {
+            const bar = document.getElementById('notification-bar');
+            if (bar) { 
+                bar.style.display = 'block'; 
+                setTimeout(() => bar.style.display = 'none', 15000); // Висит 15 секунд
+            }
+        }
+
+        /* --- ГЛАВНАЯ ЛОГИКА СТРАНИЦЫ --- */
+        document.addEventListener('DOMContentLoaded', function() {
+            
+            /* 1. Заполняем ID в окне оплаты картой (если оно есть в DOM) */
+            const userIdDisplay = document.getElementById('user-id-display');
+            if (userIdDisplay) {
+                userIdDisplay.textContent = generateUserID();
+            }
+
+            /* 2. Создаем звезды после загрузки DOM */
+            createStars(config.farStars, 'layerFar', false);
+            createStars(config.nearStars, 'layerNear', true);
+
+            /* 3. Кнопки модулей на странице "Функции" (если они есть в DOM) */
+            document.querySelectorAll('.module-btn').forEach(btn => {
+                btn.addEventListener('click', function() { 
+                    const title = this.querySelector('.btn-title').textContent;
+                    openModal('accessModal');
+                    document.getElementById('modal-module-title').textContent = `МОДУЛЬ "${title}"`;
+                });
+            });
+
+            /* 4. Кнопка проверки платежа */
+            document.getElementById('btn-check-payment').addEventListener('click', showNotification);
+        });
+    </script>
+</body>
+</html>
