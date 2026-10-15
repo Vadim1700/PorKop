@@ -4,13 +4,13 @@
     flex-direction: column;
     align-items: center;
     padding: 20px;
+    padding-bottom: 90px; /* Отступ снизу для контента, чтобы текст не заезжал на кнопку */
     min-height: calc(100vh - 60px);
     position: relative;
-    z-index: 10; /* ВАЖНО: контент должен быть выше звезд (у которых z-index 1 и 2) */
+    z-index: 10;
     color: var(--color-white);
     width: 100%;
-    /* Фон убираем, чтобы было видно звездное небо */
-    background: transparent; 
+    background: transparent;
 }
 
 .reviews-list {
@@ -21,13 +21,14 @@
     gap: 20px;
     margin-top: 30px;
     
-    max-height: 400px; 
+    max-height: calc(100vh - 220px); /* Ограничиваем высоту списка, чтобы он не уходил под кнопку */
     overflow-y: auto; 
     scroll-behavior: smooth;
     scrollbar-width: none; 
     padding-right: 5px; 
 }
 
+/* Скрываем полосу прокрутки */
 .reviews-list::-webkit-scrollbar {
     width: 0px;
     background: transparent;
@@ -102,16 +103,34 @@
     line-height: 1.5;
 }
 
-/* --- ПОДВАЛ --- */
-.footer-home-link {
-    margin-top: 40px;
+/* --- ФИКСИРОВАННАЯ КНОПКА НА ГЛАВНУЮ --- */
+.fixed-home-btn {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 20; /* Выше звезд (z-index 1 и 2) и контента */
+    
     font-family: var(--font-backup);
-    font-size: 0.9rem;
-    color: #888;
-    cursor: pointer;
-    text-align: center;
-    transition: color 0.2s;
-}
-.footer-home-link:hover {
+    font-size: 0.95rem;
     color: var(--color-white);
+    background: rgba(15, 15, 15, 0.8);
+    backdrop-filter: blur(10px);
+    border: 1px solid #444;
+    border-radius: 30px;
+    padding: 12px 25px;
+    cursor: pointer;
+    text-decoration: none;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+    transition: background 0.2s, transform 0.2s;
+}
+
+.fixed-home-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateX(-50%) translateY(-3px);
+}
+
+.fixed-home-btn::before {
+    content: '←';
+    margin-right: 8px;
 }
