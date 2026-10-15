@@ -9,16 +9,14 @@
     
     <!-- СТИЛИ ЗВЕЗДНОГО НЕБА -->
     <style>
-        /* Базовые настройки для страницы */
         html, body {
             height: 100%;
             margin: 0;
             padding: 0;
-            overflow: hidden; /* Убираем стандартную прокрутку, чтобы звезды были на весь экран */
+            overflow: hidden;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
-        /* Слой далеких звезд (создаем плотность) */
         .background-animation {
             position: fixed;
             top: 0;
@@ -29,7 +27,6 @@
             z-index: 1;
             overflow: hidden;
         }
-
         .background-animation .star {
             position: absolute;
             background-color: #ffffff;
@@ -40,8 +37,6 @@
             animation-iteration-count: infinite;
             animation-timing-function: linear, ease-in-out;
         }
-
-        /* Слой близких звезд (ярче) */
         .stars-overlay {
             position: fixed;
             top: 0;
@@ -52,18 +47,13 @@
             z-index: 2;
             overflow: hidden;
         }
-
         .stars-overlay .star {
             box-shadow: 0 0 4px 2px rgba(255, 255, 255, 0.9);
         }
-
-        /* Анимация мерцания */
         @keyframes twinkle {
             0%, 100% { opacity: 0; transform: scale(0.5); }
             50% { opacity: 1; transform: scale(1.2); }
         }
-
-        /* Анимация медленного дрейфа */
         @keyframes drift-star {
             0% { transform: translate(0, 0) scale(1); }
             100% { transform: translate(var(--dx), var(--dy)) scale(var(--end-scale)); }
@@ -221,9 +211,6 @@
                     <img src="Admin-Profile-Vector-PNG-Isolated-HD.png" alt="Avatar">
                 </div>
                 <div class="review-body">
-                    <div class="review-header">
-                        <span class="review-nick">cryformore</span>
-                    </div>
                     <div class="review-text">
                         Все норм, иногда захожу. Пока минусов не заметил.
                     </div>
@@ -421,7 +408,7 @@
                 <div class="review-body">
                     <div class="review-header">
                         <span class="review-nick">coldzera</span>
-                    </div>
+                        </div>
                     <div class="review-text">
                         выглядит достойно, надеюсь проект не забросят
                     </div>
@@ -597,55 +584,41 @@
                 </div>
             </div>
         </div>
-
-        <!-- КНОПКА НА ГЛАВНУЮ ВНИЗУ -->
-        <div class="footer-home-link" onclick="window.location.href='index.html'">
-            ← На главную
-        </div>
     </main>
+
+    <!-- НОВАЯ ФИКСИРОВАННАЯ КНОПКА -->
+    <a href="index.html" class="fixed-home-btn">← На главную</a>
 
     <!-- СКРИПТ ДЛЯ ГЕНЕРАЦИИ ЗВЕЗД -->
     <script>
-        // Настройки
         const config = {
-            farStars: 150,  // Количество далеких звезд
-            nearStars: 40,  // Количество близких звезд
-            minSize: 0.5,   
-            maxSize: 2.0,   
-            driftDistance: 30 
+            farStars: 150,
+            nearStars: 40,
+            minSize: 0.5,
+            maxSize: 2.0,
+            driftDistance: 30
         };
 
         function createStars(count, containerId, isNear) {
             const container = document.getElementById(containerId);
-            
             for (let i = 0; i < count; i++) {
                 const star = document.createElement('div');
                 star.classList.add('star');
-
-                // Случайный размер
                 const size = (Math.random() * (config.maxSize - config.minSize) + config.minSize).toFixed(2);
                 star.style.width = `${size}px`;
                 star.style.height = `${size}px`;
-
-                // Случайная позиция
-                const x = Math.random() * 100; 
-                const y = Math.random() * 100; 
+                const x = Math.random() * 100;
+                const y = Math.random() * 100;
                 star.style.left = `${x}vw`;
                 star.style.top = `${y}vh`;
-
-                // Параметры для анимации дрейфа
                 const dx = (Math.random() * config.driftDistance * 2 - config.driftDistance).toFixed(2);
                 const dy = (Math.random() * config.driftDistance * 2 - config.driftDistance).toFixed(2);
                 const endScale = isNear ? (1 + Math.random() * 0.3).toFixed(2) : 1;
-
                 star.style.setProperty('--dx', `${dx}px`);
                 star.style.setProperty('--dy', `${dy}px`);
                 star.style.setProperty('--end-scale', endScale);
-
-                // Рассинхронизация анимации
                 star.style.animationDelay = `${Math.random() * 10}s`;
                 star.style.animationDuration = `${(Math.random() * 40 + 20).toFixed(1)}s`;
-
                 container.appendChild(star);
             }
         }
