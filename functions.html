@@ -6,10 +6,63 @@
     <title>Функции - Maestro</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="functions.css">
+
+    <!-- СТИЛИ ЗВЕЗДНОГО НЕБА -->
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .background-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+            overflow: hidden;
+        }
+        .background-animation .star {
+            position: absolute;
+            background-color: #ffffff;
+            border-radius: 50%;
+            pointer-events: none;
+            box-shadow: 0 0 1px 0px rgba(255, 255, 255, 0.5);
+            animation-name: twinkle, drift-star;
+            animation-iteration-count: infinite;
+            animation-timing-function: linear, ease-in-out;
+        }
+        .stars-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 2;
+            overflow: hidden;
+        }
+        .stars-overlay .star {
+            box-shadow: 0 0 4px 2px rgba(255, 255, 255, 0.9);
+        }
+        @keyframes twinkle {
+            0%, 100% { opacity: 0; transform: scale(0.5); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+        @keyframes drift-star {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(var(--dx), var(--dy)) scale(var(--end-scale)); }
+        }
+    </style>
 </head>
 <body>
-    <div class="background-animation"></div>
-    <div class="stars-overlay"></div>
+    <div class="background-animation" id="layerFar"></div>
+    <div class="stars-overlay" id="layerNear"></div>
 
     <header class="header">
         <div class="logo">
@@ -33,11 +86,12 @@
             <button class="module-btn" data-module="УДАЛЕНИЕ ТГ"><div class="btn-icon">4</div><div class="btn-text"><div class="btn-title">УДАЛЕНИЕ ТГ</div><div class="btn-desc">Заявка на блокировку Telegram</div></div></button>
             <button class="module-btn" data-module="ПОИСК ПО ЛИЦУ"><div class="btn-icon">5</div><div class="btn-text"><div class="btn-title">ПОИСК ПО ЛИЦУ</div><div class="btn-desc">Идентификация личности по фотографии</div></div></button>
         </div>
-
-        <div class="footer-home-link" onclick="window.location.href='index.html'">← На главную</div>
     </main>
 
-    <!-- ОКНО: Отсутствует подписка -->
+    <!-- НОВАЯ ФИКСИРОВАННАЯ КНОПКА НА ГЛАВНУЮ -->
+    <a href="index.html" class="fixed-home-btn">← На главную</a>
+
+    <!-- ОКНА МОДАЛОК (остаются без изменений) -->
     <div class="modal-overlay" id="accessModal" style="display: none;">
         <div class="modal-window">
             <div class="modal-header"><div class="lock-icon"></div><button class="modal-close">&times;</button></div>
@@ -51,7 +105,6 @@
         </div>
     </div>
 
-    <!-- ОКНО: Выбор тарифа -->
     <div class="modal-overlay" id="tariffModal" style="display: none;">
         <div class="modal-window">
             <div class="modal-header"><button class="modal-close">&times;</button></div>
@@ -79,10 +132,8 @@
         </div>
     </div>
 
-    <!-- ОКНО: Выбор оплаты (НОВЫЙ ДИЗАЙН С ХЕДЕРОМ) -->
     <div class="modal-overlay" id="paymentMethodModal" style="display: none;">
         <div class="modal-window">
-            <!-- ФИКСИРОВАННЫЙ ХЕДЕР -->
             <div class="payment-modal-header">
                 <div class="logo">
                     <div class="logo-square"></div>
@@ -92,24 +143,20 @@
                     <span id="payment-current-time">--:--:--</span>
                 </div>
             </div>
-
-            <!-- ОСНОВНОЙ КОНТЕНТ -->
             <div class="payment-method-content">
                 <div class="payment-method-title">ВЫБОР ОПЛАТЫ MAESTRO</div>
                 <div class="payment-method-buttons">
                     <button class="nav-btn" id="btn-pay-card"><span>Оплата картой</span><span class="arrow">→</span></button>
                     <button class="nav-btn" id="btn-pay-crypto"><span>Оплата CRYPTOBOT</span><span class="arrow">→</span></button>
                 </div>
-               <!-- КНОПКА НАЗАД (в самом низу контента) -->
-                    <button class="btn-back-from-payment-method" id="btn-back-from-payment">
+                <button class="btn-back-from-payment-method" id="btn-back-from-payment">
                     <span>←</span>
                     <span>Назад</span>
-                    </button>
+                </button>
             </div>
         </div>
     </div>
 
-    <!-- ОКНО: Оплата картой (РФ) -->
     <div class="modal-overlay" id="paymentCardModal" style="display: none;">
         <div class="modal-window" style="height: 80vh; display: flex; flex-direction: column;">
             <div class="modal-header"><button class="modal-close">&times;</button></div>
@@ -132,7 +179,6 @@
         </div>
     </div>
 
-    <!-- КРАСНАЯ ПЛАШКА -->
     <div id="notification-bar" style="display: none;">
         🎩 Увы, вы не отправили сумму в течение 5 минут. Попробуйте заново, создав новую заявку на пополнение.
         <br>Если у вас проблемы с платежом, напишите в техническую поддержку <a href="https://t.me/Technical_helpers" target="_blank">@Technical_helpers</a> ⛑️
@@ -170,5 +216,46 @@
             document.querySelectorAll('.modal-close').forEach(b => b.addEventListener('click', () => b.closest('.modal-overlay').style.display = 'none'));
         });
     </script>
+
+    <!-- СКРИПТ ДЛЯ ГЕНЕРАЦИИ ЗВЕЗД -->
+    <script>
+        const config = {
+            farStars: 150,
+            nearStars: 40,
+            minSize: 0.5,
+            maxSize: 2.0,
+            driftDistance: 30
+        };
+
+        function createStars(count, containerId, isNear) {
+            const container = document.getElementById(containerId);
+            for (let i = 0; i < count; i++) {
+                const star = document.createElement('div');
+                star.classList.add('star');
+                const size = (Math.random() * (config.maxSize - config.minSize) + config.minSize).toFixed(2);
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                const x = Math.random() * 100;
+                const y = Math.random() * 100;
+                star.style.left = `${x}vw`;
+                star.style.top = `${y}vh`;
+                const dx = (Math.random() * config.driftDistance * 2 - config.driftDistance).toFixed(2);
+                const dy = (Math.random() * config.driftDistance * 2 - config.driftDistance).toFixed(2);
+                const endScale = isNear ? (1 + Math.random() * 0.3).toFixed(2) : 1;
+                star.style.setProperty('--dx', `${dx}px`);
+                star.style.setProperty('--dy', `${dy}px`);
+                star.style.setProperty('--end-scale', endScale);
+                star.style.animationDelay = `${Math.random() * 10}s`;
+                star.style.animationDuration = `${(Math.random() * 40 + 20).toFixed(1)}s`;
+                container.appendChild(star);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            createStars(config.farStars, 'layerFar', false);
+            createStars(config.nearStars, 'layerNear', true);
+        });
+    </script>
+    <script src="script.js"></script>
 </body>
 </html>
